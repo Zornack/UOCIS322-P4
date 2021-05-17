@@ -20,6 +20,8 @@ flask_brevets pulls km, brevet distance and starting time from the client, then 
 
 javascript updates the page asynchonrasly via AJAX and jQuery.
 
+Test calculations included for debugging. Run with nosetests. Edit tests/test_brev.py for further testing. 
+
 
 ## Credits
 
