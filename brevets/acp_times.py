@@ -25,22 +25,21 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
        A date object indicating the control open time.
        This will be in the same time zone as the brevet start time.
     """
-
-    control_dist_km = round(control_dist_km)
-
     maxToTwohundred = 34
     maxToFourhundred = 32
     maxToSixhundred = 30
     maxToOnethousand = 28
+
+    if control_dist_km < 0:
+        return None
+
+    control_dist_km = round(control_dist_km)
 
     if control_dist_km > brevet_dist_km:
         control_dist_km = brevet_dist_km
 
     h = 0
     m = 0
-
-    if control_dist_km < 0:
-        return None
 
     if control_dist_km > 600:
         above = control_dist_km - 600
@@ -83,12 +82,12 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
        This will be in the same time zone as the brevet start time.
     """
 
-    control_dist_km = round(control_dist_km)
-
     minToTwohundred = 15
     minToFourhundred = 15
     minToSixhundred = 15
     minToOnethousand = 11.428
+
+    control_dist_km = round(control_dist_km)
 
     h = 0
     m = 0
