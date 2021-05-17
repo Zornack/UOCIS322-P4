@@ -76,7 +76,7 @@
                -->
             <div class="row">
                <div class="col-md-12">
-                  <table class="control_time_table">
+                  <table class="control_time_table" id='tab'>
                      <tr>
                         <th> Miles </th>
                         <th> Km </th>
@@ -86,7 +86,7 @@
                         <th>Notes</th>
                      </tr>
                      {% for row in range(20) %}
-                     <tr class="control">
+                     <tr class="control" id ='con'>
                         <!-- Dist (mi) -->
                         <td><input name="miles" type="number" step="0.00001"
                            min="0" max="900" /></td>
@@ -102,7 +102,7 @@
                         <!-- Close time (read only, set by JavaScript function -->
                         <td><input name="close" type="datetime-local" readonly value="" /></td>
                         <!-- Notes (error messages for this row) -->
-                        <td class="notes"> &nbsp; </td>
+                        <td nowrap="nowrap" name='notes' type='text'id="notes"> </td>
                      </tr>
                      {% endfor %}
                   </table>
@@ -112,27 +112,39 @@
             <!-- row -->
          </form>
          <script type="text/javascript">
+			
             var SCRIPT_ROOT = {{ request.script_root|tojson|safe }} ;
             var TIME_CALC_URL = SCRIPT_ROOT + "/_calc_times";
+			notestwo = $("#notes")
 
-            // FIX ME!
-            // Right now, only the kilometers are passed
-            // you need to pass much more!
-            // View flask_brevets.py for details.
-            function calc_times(control) {
-              var km = control.find("input[name='km']").val();
-              var open_time_field = control.find("input[name='open']");
-              var close_time_field = control.find("input[name='close']");
+            function calc_times(con) {
+				if ( notestwo[0].innerText == "The last control can't be shorter than the total distance." ){
+					notestwo.html("")
+				}
+			  
+			  var begin = $("#begin_date").val();
+			  var dist = $("#brevet_dist_km").val();
+              var km = con.find("input[name='km']").val();
+              var open_time_field = con.find("input[name='open']");
+              var close_time_field = con.find("input[name='close']");
+			  var notes = con.find("td[name='notes']");
+			  notestwo = notes
+			  console.log(begin)
+			  console.log(dist)
+			  console.log(km)
 
-              $.getJSON(TIME_CALC_URL, {km: km}).done(
+              $.getJSON(TIME_CALC_URL, {km: km, dist: dist, begin: begin}).done(
                 function(data) {
                    var times = data.result;
                    console.log("Got a response: ");
                    console.log("Response.open = " + times.open);
-                   // This part will automatically fill the open and close slots,
-                   // so don't worry about those.
+				   console.log(km)
+				   console.log(times.open)
+				   console.log(times.close)
                    open_time_field.val(moment(times.open).format("YYYY-MM-DDTHH:mm"));
                    close_time_field.val(moment(times.close).format("YYYY-MM-DDTHH:mm"));
+				   notes.html(times.error.fontcolor('red'))
+				   
                  }
                ).fail(function(err){
                  // In case you get an error...
@@ -147,7 +159,7 @@
                 $('input[name="miles"]').change(
                    function() {
                        var miles = parseFloat($(this).val());
-                       var km = (1.609344 * miles).toFixed(6) ;
+                       var km = Math.floor((1.609344 * miles).toFixed(6)) ;
                        console.log("Converted " + miles + " miles to " + km + " kilometers");
                        var control_entry = $(this).parents(".control")
                        var target = control_entry.find("input[name='km']");

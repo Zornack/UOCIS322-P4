@@ -17,7 +17,6 @@ import logging
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
-app.secret_key = CONFIG.SECRET_KEY
 
 ###
 # Pages
@@ -34,7 +33,6 @@ def index():
 @app.errorhandler(404)
 def page_not_found(error):
     app.logger.debug("Page not found")
-    flask.session['linkback'] = flask.url_for("index")
     return flask.render_template('404.html'), 404
 
 
@@ -49,19 +47,24 @@ def _calc_times():
     """
     Calculates open/close times from miles, using rules
     described at https://rusa.org/octime_alg.html.
-    Expects one URL-encoded argument, the number of miles.
+    Expects oge URL-encoded argument, the number of miles.
     """
     app.logger.debug("Got a JSON request")
-    km = request.args.get('km', 999, type=float)
+    km = request.args.get('km', type=float)
+    dist = request.args.get('dist', type=float)
+    begin = request.args.get('begin')
+    error = ""
     app.logger.debug("km={}".format(km))
     app.logger.debug("request.args: {}".format(request.args))
-    # FIXME!
-    # Right now, only the current time is passed as the start time
-    # and control distance is fixed to 200
-    # You should get these from the webpage!
-    open_time = acp_times.open_time(km, 200, arrow.now().isoformat).format('YYYY-MM-DDTHH:mm')
-    close_time = acp_times.close_time(km, 200, arrow.now().isoformat).format('YYYY-MM-DDTHH:mm')
-    result = {"open": open_time, "close": close_time}
+    #Adds an error if the distance is longer than the brevet or is negative.
+    if ( km > dist*1.2 ):
+        error = "This control point is over 20% longer than the total distance."
+    if (km < 0):
+        error = "The distance can not be negative."
+
+    open_time = acp_times.open_time(km, dist, begin).format('YYYY-MM-DDTHH:mm')
+    close_time = acp_times.close_time(km, dist, begin).format('YYYY-MM-DDTHH:mm')
+    result = {"open": open_time, "close": close_time, "error": error}
     return flask.jsonify(result=result)
 
 
