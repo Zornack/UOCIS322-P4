@@ -4,6 +4,8 @@
 
 An ACP brevet time calculator. 
 
+Dockerfile included for ease of use with docker build and docker run. 
+
 Distances input as miles are converted to kilometers then floored. Distances input as kilometers are rounded to the nearest digit.
 
 Kilometer distances are converted to opening and closing times following the minimum and maximum speeds listed here: https://rusa.org/pages/acp-brevet-control-times-calculator 
