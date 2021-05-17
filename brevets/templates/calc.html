@@ -147,9 +147,10 @@
 				   
                  }
                ).fail(function(err){
+			     var times = data.result;
+				 notes.html(times.error.fontcolor('red'))
                  // In case you get an error...
                  console.log("Error!");
-                 console.log(err);
                });
             }
 

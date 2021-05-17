@@ -61,6 +61,10 @@ def _calc_times():
         error = "This control point is over 20% longer than the total distance."
     if (km < 0):
         error = "The distance can not be negative."
+        open_time = None
+        close_time = None
+        result = {"open": open_time, "close": close_time, "error": error}
+        return flask.jsonify(result=result)
 
     open_time = acp_times.open_time(km, dist, begin).format('YYYY-MM-DDTHH:mm')
     close_time = acp_times.close_time(km, dist, begin).format('YYYY-MM-DDTHH:mm')
